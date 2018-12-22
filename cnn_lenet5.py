@@ -223,11 +223,7 @@ def cnn_model_fn(features, labels, mode):
 #     receive_tensors = tf.placeholder(dtype=tf.float32, shape=[])
 #     features = {"input": patch_images}
     # return tf.estimator.export.ServingInputReceiver(patch_images, inputs)
-import platform
-if platform.system() == "Linux":
-    dataset_path = '/home/tensorflow/img/imgdownload'
-else:
-    dataset_path = '/Users/zkp/Desktop/for_zkp/train'
+dataset_path = './imgdownload'
 
 def main(unused_argv):
     # Load training and eval data
