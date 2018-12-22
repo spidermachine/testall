@@ -250,7 +250,7 @@ def main(unused_argv):
     # mnist_classifier.export_savedmodel('export', serving_input_receiver_fn=export_func)
 
     # Evaluate the model and print results
-    eval_results = mnist_classifier.evaluate(input_fn=get_test_dataset(dataset_path))
+    eval_results = mnist_classifier.evaluate(input_fn=get_train_dataset(dataset_path))
     print(eval_results)
 
 import time
