@@ -25,9 +25,9 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 def _parse_function(filename, label):
     image_string = tf.read_file(filename)
-    image_decoded = tf.image.decode_bmp(image_string)
+    image_decoded = tf.image.decode_jpeg(image_string)
     image_resized = tf.image.resize_images(image_decoded, [28, 28])
-    image_resized = tf.image.rgb_to_grayscale(image_resized)
+    # image_resized = tf.image.rgb_to_grayscale(image_resized)
     return image_resized, label
 
 """
@@ -66,16 +66,18 @@ def get_train_dataset(img_dir):
         ll = 0
         # lll = 0
         labels = []
-        for bmpfile in files:
-            if bmpfile.split(".")[1] != "bmp":
-                print(bmpfile)
-                exit(0)
-            images.append(os.path.join(img_dir + "/", bmpfile))
-            key = bmpfile.split("_")[1][0]
-            if labelmap.get(key) is None:
-                labelmap[key] = ll
-                ll = ll + 1
-            labels.append(labelmap.get(key))
+        for label in files:
+            if os.path.isdir(img_dir + "/" + label):
+                for jpgfile in os.listdir(img_dir + "/" + label):
+                    if jpgfile.split(".")[1] != "jpg":
+                        print(jpgfile)
+                        exit(0)
+                    images.append(os.path.join(img_dir + "/" + label + "/", jpgfile))
+                    key = label
+                    if labelmap.get(key) is None:
+                        labelmap[key] = ll
+                        ll = ll + 1
+                    labels.append(labelmap.get(key))
         print(
             labelmap
         )
@@ -99,7 +101,7 @@ def get_test_dataset(img_dir):
         # lll = 0
         labels = []
         for bmpfile in files:
-            if bmpfile.split(".")[1] != "bmp":
+            if bmpfile.split(".")[1] != "jpg":
                 print(bmpfile)
                 exit(0)
             images.append(os.path.join(img_dir + "/", bmpfile))
@@ -179,7 +181,7 @@ def cnn_model_fn(features, labels, mode):
     # Logits layer
     # Input Tensor Shape: [batch_size, 1024]
     # Output Tensor Shape: [batch_size, 10]
-    logits = tf.layers.dense(inputs=dropout, units=36)
+    logits = tf.layers.dense(inputs=dropout, units=33)
 
     predictions = {
         # Generate predictions (for PREDICT and EVAL mode)
@@ -221,7 +223,11 @@ def cnn_model_fn(features, labels, mode):
 #     receive_tensors = tf.placeholder(dtype=tf.float32, shape=[])
 #     features = {"input": patch_images}
     # return tf.estimator.export.ServingInputReceiver(patch_images, inputs)
-
+import platform
+if platform.system() == "Linux":
+    dataset_path = '/home/tensorflow/img/imgdownload'
+else:
+    dataset_path = '/Users/zkp/Desktop/for_zkp/train'
 
 def main(unused_argv):
     # Load training and eval data
@@ -237,14 +243,14 @@ def main(unused_argv):
         tensors=tensors_to_log, every_n_iter=50)
     #
     mnist_classifier.train(
-        input_fn=get_train_dataset('/Users/zkp/Desktop/for_zkp/train'),
-        steps=20000,
+        input_fn=get_train_dataset(dataset_path),
+        steps=100000,
         hooks=[logging_hook])
 
     # mnist_classifier.export_savedmodel('export', serving_input_receiver_fn=export_func)
 
     # Evaluate the model and print results
-    eval_results = mnist_classifier.evaluate(input_fn=get_test_dataset('/Users/zkp/Desktop/for_zkp/train'))
+    eval_results = mnist_classifier.evaluate(input_fn=get_test_dataset(dataset_path))
     print(eval_results)
 
 
