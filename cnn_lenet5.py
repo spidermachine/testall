@@ -253,8 +253,10 @@ def main(unused_argv):
     eval_results = mnist_classifier.evaluate(input_fn=get_test_dataset(dataset_path))
     print(eval_results)
 
-
+import time
 if __name__ == "__main__":
+    start = time.mktime(time.localtime())
     tf.app.run()
+    print(time.mktime(time.localtime()) - start)
     # main(None)
     # get_train_dataset('/Users/zkp/Desktop/for_zkp/train')()
