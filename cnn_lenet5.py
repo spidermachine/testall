@@ -20,7 +20,7 @@ from __future__ import print_function
 import tensorflow as tf
 import os
 
-tf.logging.set_verbosity(tf.logging.INFO)
+#tf.logging.set_verbosity(tf.logging.INFO)
 
 
 def _parse_function(filename, label):
