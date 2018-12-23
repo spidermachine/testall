@@ -20,15 +20,16 @@ from __future__ import print_function
 import tensorflow as tf
 import os
 import json
+import splitimagesimple
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
 
 def _parse_function(filename, label):
     image_string = tf.read_file(filename)
-    image_decoded = tf.image.decode_bmp(image_string)
+    image_decoded = tf.image.decode_jpeg(image_string)
     image_resized = tf.image.resize_images(image_decoded, [28, 28])
-    image_resized = tf.image.rgb_to_grayscale(image_resized)
+    # image_resized = tf.image.rgb_to_grayscale(image_resized)
     return image_resized, label
 
 def get_train_dataset(img_dir):
@@ -106,7 +107,7 @@ def cnn_model_fn(features, labels, mode):
     # Logits layer
     # Input Tensor Shape: [batch_size, 1024]
     # Output Tensor Shape: [batch_size, 10]
-    logits = tf.layers.dense(inputs=dropout, units=36)
+    logits = tf.layers.dense(inputs=dropout, units=33)
 
     predictions = {
         # Generate predictions (for PREDICT and EVAL mode)
@@ -139,8 +140,7 @@ def cnn_model_fn(features, labels, mode):
     return tf.estimator.EstimatorSpec(
         mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 
-
-dictmap = {'H': 0, 'W': 1, '6': 2, 'A': 3, 'V': 4, '7': 5, 'M': 6, 'D': 7, 'N': 8, 'G': 9, 'Z': 10, '2': 11, 'S': 12, 'Y': 13, '8': 14, '1': 15, 'P': 16, '4': 17, 'U': 18, 'I': 19, 'B': 20, 'O': 21, 'F': 22, 'E': 23, 'L': 24, 'Q': 25, '0': 26, '9': 27, 'X': 28, 'R': 29, '3': 30, 'C': 31, 'J': 32, 'T': 33, '5': 34, 'K': 35}
+dictmap = {'3': 14, '5': 30, '4': 26, '7': 2, '6': 11, '9': 4, '8': 8, 'A': 21, 'C': 10, 'B': 3, 'E': 16, 'D': 31, 'G': 20, 'F': 13, 'I': 0, 'H': 23, 'K': 12, 'J': 27, 'M': 28, 'L': 1, 'O': 29, 'N': 32, 'Q': 22, 'P': 24, 'S': 7, 'R': 25, 'U': 9, 'T': 19, 'W': 15, 'V': 5, 'Y': 6, 'X': 17, 'Z': 18}
 result = {}
 for k, v in dictmap.items():
     result[str(v)] = k
@@ -163,6 +163,19 @@ app = Flask(__name__)
 def img_predict():
     img_path = request.form['imgPath']
     return main(img_path)
+
+
+@app.route('/full', methods=['POST'])
+def img_full():
+    img_path = request.form['imgPath']
+    sub_file = splitimagesimple.img_process(os.path.dirname(img_path), os.path.basename(img_path))
+    ret_result = ''
+    for sfile in sub_file:
+        pre = json.loads(main(sfile))
+        ret_result = "%s%s" % (ret_result, pre['predict'])
+
+    return json.dumps({'predict': ret_result})
+
 
 
 if __name__ == "__main__":
