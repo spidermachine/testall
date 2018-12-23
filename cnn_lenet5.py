@@ -224,10 +224,12 @@ def cnn_model_fn(features, labels, mode):
 #     features = {"input": patch_images}
     # return tf.estimator.export.ServingInputReceiver(patch_images, inputs)
 dataset_path = './imgdownload'
+import time
 
 def main(unused_argv):
     # Load training and eval data
 
+    start = time.mktime(time.localtime())
     # Create the Estimator
     mnist_classifier = tf.estimator.Estimator(
         model_fn=cnn_model_fn, model_dir="model")
@@ -248,11 +250,7 @@ def main(unused_argv):
     # Evaluate the model and print results
     eval_results = mnist_classifier.evaluate(input_fn=get_train_dataset(dataset_path))
     print(eval_results)
-
-import time
-if __name__ == "__main__":
-    start = time.mktime(time.localtime())
-    tf.app.run()
     print(time.mktime(time.localtime()) - start)
-    # main(None)
-    # get_train_dataset('/Users/zkp/Desktop/for_zkp/train')()
+
+if __name__ == "__main__":
+    tf.app.run()
