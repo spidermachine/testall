@@ -74,7 +74,7 @@ def img_process(img_path, img_file):
 
     for x in remain:
         remain_list.append(remain_map[str(x)])
-    print "-------------------------------------------------"
+    print("-------------------------------------------------")
 
     print(remain_list)
 
@@ -129,7 +129,7 @@ def img_process(img_path, img_file):
     i = 0
 
     index = add_map.keys()
-    index.sort()
+    sorted(index)
 
     for k in index:
         remain_list.insert(int(k), add_map.get(k))
@@ -143,7 +143,7 @@ def img_process(img_path, img_file):
     remain = None
     remove_list = None
     remove_list = None
-    print remain_list
+    print(remain_list)
 
     if len(remain_list) == 6:
         sub_file = []
